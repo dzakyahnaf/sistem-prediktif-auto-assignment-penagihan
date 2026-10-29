@@ -2,6 +2,8 @@
 
 Prototype predictive scoring dan auto-assignment untuk penagihan dan pengajuan pinjaman. Flutter/Dart memakai API FastAPI/Pydantic, SQLAlchemy Core/Alembic dan PostgreSQL persisten. Seluruh identitas, histori dan transaksi demo bersifat sintetis.
 
+**Demo web:** https://assignment-studio-demo.onrender.com — pengunjung login `demo` / `DemoAssignment!2026`, akses baca. Supervisor cloud menggunakan password privat hosting. Render dan Neon memakai paket Free di Singapore; kunjungan pertama setelah idle dapat menunggu service bangun. Data cloud terpisah dari workspace lokal, rules aktif dan belum ada kandidat model/segmen lokal yang disalin ke cloud. Bukti UAT dan batas cloud ada di [panduan deployment](docs/deploy-render-neon.md).
+
 Pengerjaan mencapai **Sprint 13: penerimaan dan serah terima**. Web dan Android emulator menjalankan workflow nyata. Runner iOS tersedia, tetapi build/UAT iOS masih membutuhkan macOS/Xcode. Status dan bukti per sprint ada di [PROGRESS](docs/PROGRESS.md); panduan akhir di [penerimaan dan serah terima](docs/penerimaan-dan-serah-terima.md).
 
 ## Fitur yang tersedia
@@ -45,7 +47,7 @@ Di terminal kedua, jika web belum berjalan:
 
 Startup backend default membaca config privat `runtime/postgres-local.json`. Jangan init ulang klaster yang sudah terisi. Service PostgreSQL pengguna 5433 tidak diubah. `DATABASE_URL` atau `DATABASE_PATH` eksplisit memilih target lain; gunakan hanya target yang dimaksud. Head Alembic **0006_hardening** setelah portable, analytics, models, decisions dan operations. SQLite tetap didukung untuk tes/paket; tidak otomatis memuat perubahan PostgreSQL setelah cutover.
 
-## Akun demo
+## Akun demo lokal
 
 Supervisor `supervisor`. Petugas `smg-col-a`, `smg-col-b`, `smg-ori-a`, `smg-ori-b`; pola sama untuk `sby` dan `bdg`. Semua password awal **DemoAssignment!2026**. Reset UAT Sprint12 dipulihkan ke password demo; akun utama tidak diubah oleh latihan tersebut.
 
@@ -53,7 +55,7 @@ Lima login gagal per kombinasi asal/username atau 30 per asal dalam 15 menit men
 
 ## Paket demo dan Android
 
-Deployment publik Render + Neon memakai `Dockerfile`, `render.yaml` dan [panduan cloud](docs/deploy-render-neon.md). Akses pengunjung cloud hanya baca; supervisor menggunakan secret privat hosting. Konfigurasi sudah disiapkan, status deploy/UAT aktual dicatat di PROGRESS. Database lokal dan hasil demo lama tidak dibawa otomatis ke cloud.
+Deployment publik Render + Neon memakai `Dockerfile`, `render.yaml` dan [panduan cloud](docs/deploy-render-neon.md). Akses pengunjung cloud hanya baca; supervisor menggunakan secret privat hosting. Status deploy/UAT aktual dicatat di PROGRESS. Database lokal dan hasil demo lama tidak dibawa otomatis ke cloud.
 
 ```powershell
 .\scripts\build-demo.ps1 -FlutterSdk 'C:\flutter' -Offline
@@ -75,6 +77,8 @@ APK demo debug di `runtime/artifacts`, memakai `lib/main.dart` dan API host emul
 
 Regresi Sprint13: **106 tes SQLite lulus, 93 tes Flutter lulus, analyze bersih dan build web berhasil, 9 tes migrasi lulus**. Regresi PostgreSQL: 105 lulus/1 khusus SQLite dilewati dari 106 tes; UAT Android lintas role/inbox/kedua workflow lulus. UAT paket dan bukti akhir ada di PROGRESS. Satu tes khusus SQLite dilewati pada PostgreSQL. Tes memakai file/schema UUID terisolasi. Native workflow, picker/save/IME dan Chrome desktop/390px memiliki bukti terpisah; build tidak dianggap pengganti UAT.
 
+Verifikasi cloud yang lebih baru: [CI a89a495](https://github.com/dzakyahnaf/sistem-prediktif-auto-assignment-penagihan/actions/runs/40844358486) lulus backend **111 tes**, Flutter **95 tes/analyze/build**, serta build/smoke Docker Linux. Sebelum deployment, regresi PostgreSQL tambahan **110 lulus/1 SQLite-only dilewati**, dan **9 tes migrasi** lulus. Pemeriksaan cloud aktual dicatat terpisah di PROGRESS.
+
 Backup dengan nama baru:
 
 ```powershell
@@ -87,7 +91,7 @@ Tool mengekspor snapshot dan memverifikasi restore pada database baru; tidak men
 
 [Arsitektur](docs/arsitektur.md), [PostgreSQL](docs/postgresql.md), [master/override](docs/master-dan-override.md), [impor](docs/impor-operasional.md), [laporan](docs/laporan-operasional.md), [histori analitik](docs/analitik-historis.md), [model](docs/model-predictive.md), [keputusan/segmen](docs/keputusan-dan-segmen.md), [operasi/notifikasi](docs/operasi-dan-notifikasi.md), [penerimaan](docs/penerimaan-dan-serah-terima.md).
 
-Belum diterima: build/UAT iOS, Android fisik, signing/store, validasi bisnis/model pada data nyata, ingest histori nyata, integrasi vendor live, deployment publik/TLS/HA/monitoring/load test produksi. Impor operasional tidak mengimpor aktivitas/master atau memperbarui kasus lama. Tidak membutuhkan API key untuk demo lokal; vendor live memerlukan akses/kunci terpisah.
+Belum diterima: build/UAT iOS, Android fisik, signing/store, validasi bisnis/model pada data nyata, ingest histori nyata, integrasi vendor live, serta HA/monitoring/load test produksi. Demo cloud Free bukan penerimaan produksi; profiling training/segmentasi di RAM512MB dan konfigurasi ingress masih perlu verifikasi tersendiri. Impor operasional tidak mengimpor aktivitas/master atau memperbarui kasus lama. Tidak membutuhkan API key untuk demo lokal; vendor live memerlukan akses/kunci terpisah.
 
 ## Mesin baru
 
