@@ -1,0 +1,20 @@
+name: assignment_studio
+description: Prototype penagihan dan pengajuan dengan workflow assignment.
+publish_to: none
+version: 0.13.0+13
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+  flutter: '>=3.35.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  web: ^1.1.1
+  file_picker: 13.3.0
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true

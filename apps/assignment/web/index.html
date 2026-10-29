@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ruang kerja penagihan dan pengajuan pinjaman. Prototype data sintetis.">
+  <meta name="theme-color" content="#102A36">
+  <title>Assignment Studio</title>
+  <style>body{margin:0;background:#f4f7f9;font-family:system-ui;color:#102a36}#loading{display:grid;place-items:center;height:100vh}</style>
+</head>
+<body>
+  <div id="loading" role="status">Menyiapkan ruang kerja…</div>
+  <script>window.addEventListener('flutter-first-frame',()=>document.getElementById('loading')?.remove());</script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

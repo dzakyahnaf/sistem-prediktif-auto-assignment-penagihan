@@ -1,0 +1,17 @@
+param([int]$Port = 5173, [string]$ApiUrl = 'http://127.0.0.1:8000', [string]$FlutterSdk = '', [switch]$Offline)
+$ErrorActionPreference = 'Stop'
+$projectRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'flutter-toolchain.ps1')
+$flutterExe = Resolve-ProjectFlutter -ProjectRoot $projectRoot -FlutterSdk $FlutterSdk
+$priorPubCache = $env:PUB_CACHE
+$env:PUB_CACHE = Join-Path $projectRoot '.cache/pub'
+Push-Location (Join-Path $projectRoot 'apps/assignment')
+try {
+    $pubArgs = @('pub', 'get')
+    if ($Offline) { $pubArgs += '--offline' }
+    & $flutterExe @pubArgs
+    Assert-FlutterExit 'flutter pub get'
+    & $flutterExe run -d web-server --web-hostname 127.0.0.1 --web-port $Port "--dart-define=API_URL=$ApiUrl"
+    Assert-FlutterExit 'flutter run'
+}
+finally { Pop-Location; $env:PUB_CACHE = $priorPubCache }

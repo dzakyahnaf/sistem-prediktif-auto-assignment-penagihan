@@ -1,0 +1,15 @@
+.venv/
+.cache/
+.tools/
+__pycache__/
+*.pyc
+*.db
+*.db-shm
+*.db-wal
+.env
+apps/assignment/.dart_tool/
+apps/assignment/build/
+apps/assignment/.flutter-plugins-dependencies
+apps/assignment/android/local.properties
+apps/assignment/ios/Pods/
+runtime/
