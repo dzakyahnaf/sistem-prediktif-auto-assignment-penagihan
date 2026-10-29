@@ -1,6 +1,6 @@
 # Demo publik di Render + Neon
 
-Status: konfigurasi dan pengujian disiapkan; pembuatan resource serta UAT URL publik belum selesai. Gunakan hasil aktual pada PROGRESS.md untuk mengetahui commit yang sudah diuji/deploy. Deployment ini terpisah dari database demo PostgreSQL lokal dan SQLite asli.
+Status: konfigurasi dan tes lokal serta CI Linux backend/frontend/build dan startup Docker lulus pada commit **5b61cc7**. Pembuatan resource dan UAT URL publik belum selesai karena Browser Use belum terhubung pada sesi CLI. Gunakan hasil aktual pada PROGRESS.md untuk mengetahui commit yang sudah diuji/deploy. Deployment ini terpisah dari database demo PostgreSQL lokal dan SQLite asli.
 
 ## Bentuk deployment
 
