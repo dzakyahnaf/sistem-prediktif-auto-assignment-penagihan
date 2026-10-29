@@ -1,7 +1,9 @@
 FROM ubuntu:24.04 AS flutter-build
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git unzip xz-utils libglu1-mesa && rm -rf /var/lib/apt/lists/*
 ARG FLUTTER_VERSION=3.41.6
-ENV CI=true
+# Rootless builders cannot restore the high UID/GID stored in Flutter archives.
+# Keep extracted SDK artifacts owned by the builder instead.
+ENV CI=true TAR_OPTIONS=--no-same-owner
 RUN git clone --depth 1 --branch ${FLUTTER_VERSION} https://github.com/flutter/flutter.git /opt/flutter
 ENV PATH=/opt/flutter/bin:$PATH
 RUN flutter config --no-analytics && flutter precache --web
