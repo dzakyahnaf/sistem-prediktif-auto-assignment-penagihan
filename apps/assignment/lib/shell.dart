@@ -290,7 +290,7 @@ class _WorkspaceState extends State<Workspace> {
           ))))),
           const Divider(color: Colors.white24), const SizedBox(height: 12),
           Text(widget.api.user?['username'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 6), Text(widget.api.supervisor ? 'Supervisor' : 'Petugas', style: const TextStyle(color: Colors.white54)),
+          const SizedBox(height: 6), Text(widget.api.supervisor ? 'Supervisor' : widget.api.readOnly ? 'Pengunjung · akses baca' : 'Petugas', style: const TextStyle(color: Colors.white54)),
           const SizedBox(height: 12), TextButton.icon(onPressed: logout, icon: const Icon(Icons.logout, size: 16), label: const Text('Keluar'), style: TextButton.styleFrom(foregroundColor: Colors.white70)),
         ])))),
         Expanded(child: SafeArea(child: Column(children: [
@@ -338,7 +338,7 @@ class _WorkspaceState extends State<Workspace> {
             style: OutlinedButton.styleFrom(foregroundColor: Colors.white), icon: const Icon(Icons.science_outlined), label: const Text('Model & evaluasi')),
           if (widget.api.supervisor) OutlinedButton.icon(onPressed: openDecisions,
             style: OutlinedButton.styleFrom(foregroundColor: Colors.white), icon: const Icon(Icons.tune), label: const Text('Keputusan & segmen')),
-          OutlinedButton.icon(onPressed:openOperations,style:OutlinedButton.styleFrom(foregroundColor:Colors.white),icon:const Icon(Icons.notifications_outlined),label:const Text('Operasi & notifikasi')),
+          if (!widget.api.readOnly) OutlinedButton.icon(onPressed:openOperations,style:OutlinedButton.styleFrom(foregroundColor:Colors.white),icon:const Icon(Icons.notifications_outlined),label:const Text('Operasi & notifikasi')),
         ]),
       ])),
       const SizedBox(height: 24),

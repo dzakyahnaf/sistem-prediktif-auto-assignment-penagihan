@@ -1,0 +1,50 @@
+name: Verify demo
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: pip install --require-hashes -r backend/requirements.txt
+      - run: python -m unittest discover -s tests -v
+        working-directory: backend
+  frontend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Install pinned Flutter SDK
+        run: |
+          git clone --depth 1 --branch 3.41.6 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter config --no-analytics
+      - run: flutter pub get --enforce-lockfile
+        working-directory: apps/assignment
+      - run: flutter analyze
+        working-directory: apps/assignment
+      - run: flutter test
+        working-directory: apps/assignment
+      - run: flutter build web --release --no-pub --no-wasm-dry-run --no-web-resources-cdn --dart-define=API_URL= --dart-define=PUBLIC_DEMO=true
+        working-directory: apps/assignment
+  docker:
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - run: docker build -t assignment-demo:ci .
+      - name: Smoke image without cloud credentials
+        run: |
+          docker run -d --name smoke -e APP_ENV=local -e DATABASE_PATH=/tmp/smoke.db -p 10000:10000 assignment-demo:ci
+          for i in $(seq 1 30); do
+            if curl --fail http://127.0.0.1:10000/api/health; then
+              curl --fail http://127.0.0.1:10000/ > /dev/null
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs smoke
+          exit 1

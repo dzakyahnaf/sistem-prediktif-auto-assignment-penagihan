@@ -27,6 +27,7 @@ class Api extends ChangeNotifier {
   Api({http.Client? client, this.baseUrl = const String.fromEnvironment('API_URL', defaultValue: 'http://127.0.0.1:8000'), this.timeout = const Duration(seconds: 15)})
       : client = client ?? http.Client();
   bool get supervisor => user?['role'] == 'supervisor';
+  bool get readOnly => user?['role'] == 'viewer';
 
   Future<dynamic> request(String method, String path, [Object? data]) async {
     return _request(method, path, data);

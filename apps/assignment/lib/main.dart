@@ -46,7 +46,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final username = TextEditingController(text: 'supervisor');
+  static const publicDemo = bool.fromEnvironment('PUBLIC_DEMO',defaultValue:false);
+  final username = TextEditingController(text: publicDemo ? 'demo' : 'supervisor');
   final password = TextEditingController();
   final form = GlobalKey<FormState>();
   bool busy = false;
@@ -76,7 +77,9 @@ class _LoginPageState extends State<LoginPage> {
         TextFormField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'Password'), validator: (v) => v!.isEmpty ? 'Isi password.' : null, onFieldSubmitted: (_) { if (!busy) submit(); }),
         if (error != null) Padding(padding: const EdgeInsets.only(top: 16), child: Text(error!, style: const TextStyle(color: Colors.red))),
         const SizedBox(height: 24), SizedBox(width: double.infinity, child: FilledButton(onPressed: busy ? null : submit, child: Text(busy ? 'Memeriksa…' : 'Masuk ke ruang kerja'))),
-        const SizedBox(height: 20), const Text('Akun demo: supervisor\nPassword: DemoAssignment!2026', style: TextStyle(color: muted, fontSize: 12, height: 1.7)),
+        const SizedBox(height: 20), const Text(publicDemo
+          ? 'Akun pengunjung: demo\nPassword: DemoAssignment!2026\nAkses baca. Supervisor dan petugas memakai credential privat.'
+          : 'Akun demo lokal: supervisor\nPassword: DemoAssignment!2026', style: TextStyle(color: muted, fontSize: 12, height: 1.7)),
       ])),
     )),
   )));

@@ -53,6 +53,8 @@ Lima login gagal per kombinasi asal/username atau 30 per asal dalam 15 menit men
 
 ## Paket demo dan Android
 
+Deployment publik Render + Neon memakai `Dockerfile`, `render.yaml` dan [panduan cloud](docs/deploy-render-neon.md). Akses pengunjung cloud hanya baca; supervisor menggunakan secret privat hosting. Konfigurasi sudah disiapkan, status deploy/UAT aktual dicatat di PROGRESS. Database lokal dan hasil demo lama tidak dibawa otomatis ke cloud.
+
 ```powershell
 .\scripts\build-demo.ps1 -FlutterSdk 'C:\flutter' -Offline
 .\scripts\build-android.ps1 -FlutterSdk 'C:\flutter' -Offline

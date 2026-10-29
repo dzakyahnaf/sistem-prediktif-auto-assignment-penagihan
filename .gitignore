@@ -7,6 +7,12 @@ __pycache__/
 *.db-shm
 *.db-wal
 .env
+.env.*
+!.env.example
+*.dump
+*.pem
+*.p12
+*.key
 apps/assignment/.dart_tool/
 apps/assignment/build/
 apps/assignment/.flutter-plugins-dependencies

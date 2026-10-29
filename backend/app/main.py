@@ -18,6 +18,8 @@ from .domain import MODEL_VERSION, TERMINAL, score_case, target_team, timestamp
 from .schemas import ActivityInput, AgentUpdate, AssignRequest, CaseCreate, Kind, Login, ReassignRequest
 from .security import token_hash, verify_password, password_hash
 from . import login_guard
+from .deployment import Deployment
+from .cloud_accounts import provision
 from .seed import seed_demo
 from .reports import ReportFilter, csv_content, report_filters, report_result, report_rows
 from .imports import register_import_routes
@@ -33,21 +35,24 @@ import json
 from .service import add_activity, agent_load, assign_one, audit, recommendations, reassign, require_case
 
 
-def create_app(db_path=None, clock=None, seed=True, web_path=None):
+def create_app(db_path=None, clock=None, seed=True, web_path=None, deployment=None):
+    deployment=deployment or Deployment.environment()
     db = Database(db_path or os.getenv('DATABASE_URL') or os.getenv('DATABASE_PATH', str(Path(__file__).resolve().parents[2] / 'runtime' / 'assignment.db')))
     clock = clock or (lambda: datetime.now(timezone.utc))
 
     @asynccontextmanager
     async def lifespan(app):
-        db.initialize()
-        if seed:
-            seed_demo(db, clock())
-        yield
-        db.dispose()
+        try:
+            db.initialize()
+            if seed:
+                seed_demo(db, clock())
+                if deployment.cloud:provision(db,deployment.admin_password,clock())
+            yield
+        finally:db.dispose()
 
     app = FastAPI(title='Assignment Studio · Prototype API', version='0.13.0', lifespan=lifespan)
     app.state.db = db
-    app.add_middleware(CORSMiddleware, allow_origins=['http://localhost:5173', 'http://127.0.0.1:5173'],
+    app.add_middleware(CORSMiddleware, allow_origins=list(deployment.cors_origins),
                        allow_methods=['GET', 'POST', 'PATCH'], allow_headers=['Authorization', 'Content-Type'])
     bearer = HTTPBearer(auto_error=False)
 
@@ -60,14 +65,16 @@ def create_app(db_path=None, clock=None, seed=True, web_path=None):
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         return response
 
-    def current_user(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]):
+    def current_user(request:Request, credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]):
         if credentials is None:
             raise HTTPException(401, 'Silakan masuk.', headers={'WWW-Authenticate': 'Bearer'})
         with db.connect() as conn:
             user = conn.execute('SELECT u.* FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires_at>?',
                                 (token_hash(credentials.credentials), timestamp(clock()))).fetchone()
-            if user is None or not account_active(conn,user['id']):
+            if user is None or user['role'] not in {'supervisor','agent','viewer'} or not account_active(conn,user['id']):
                 raise HTTPException(401, 'Sesi habis. Silakan masuk kembali.', headers={'WWW-Authenticate': 'Bearer'})
+            if user['role']=='viewer' and request.method not in {'GET','HEAD'} and request.url.path!='/api/auth/logout':
+                raise HTTPException(403,'Akun demo publik hanya dapat membaca. Gunakan akun petugas/supervisor privat untuk perubahan.')
             return {k: user[k] for k in ('id', 'username', 'role', 'agent_id')}
 
     def supervisor(user=Depends(current_user)):
@@ -77,7 +84,7 @@ def create_app(db_path=None, clock=None, seed=True, web_path=None):
 
     def scope(user, kind=None, status=None, q=None):
         terms, args = [], []
-        if user['role'] != 'supervisor':
+        if user['role'] == 'agent':
             terms.append('agent_id=?'); args.append(user['agent_id'])
         if kind:
             terms.append('kind=?'); args.append(kind)
@@ -103,7 +110,7 @@ def create_app(db_path=None, clock=None, seed=True, web_path=None):
     dummy_hash=password_hash(secrets.token_urlsafe(32))
     @app.post('/api/auth/login')
     def login(payload: Login, request: Request):
-        peer=request.client.host if request.client else 'unknown'
+        peer=deployment.peer(request)
         result=None
         with db.connect(write=True) as conn:
             retry,rows=login_guard.check(conn,peer,payload.username,clock())

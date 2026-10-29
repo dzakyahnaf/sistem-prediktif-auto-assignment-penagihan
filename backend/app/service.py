@@ -12,7 +12,7 @@ from .operation_events import agent_account_active,assignment_event
 
 def require_case(conn, case_id, user):
     row = conn.execute('SELECT * FROM cases WHERE id=?', (case_id,)).fetchone()
-    if row is None or (user['role'] != 'supervisor' and row['agent_id'] != user['agent_id']):
+    if row is None or (user['role'] == 'agent' and row['agent_id'] != user['agent_id']):
         raise HTTPException(404, 'Kasus tidak ditemukan.')
     return dict(row)
 

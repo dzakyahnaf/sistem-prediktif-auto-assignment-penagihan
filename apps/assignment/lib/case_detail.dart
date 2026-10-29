@@ -91,8 +91,8 @@ class _CaseDetailState extends State<CaseDetail> {
             else Text('Minat ${c['interest']}/5 · Penghasilan ${rupiah(c['income'] as num)}\nDokumen: ${c['documents_complete'] == 1 ? 'lengkap' : 'belum lengkap'}. Pencairan hanya simulasi.', style: const TextStyle(color: muted, height: 1.6)),
             const SizedBox(height: 24), Wrap(spacing: 12, runSpacing: 12, children: [
               if (widget.api.supervisor && c['agent_id'] == null && !closed) FilledButton.icon(onPressed: busy || loading ? null : assign, icon: const Icon(Icons.person_add_alt), label: const Text('Tugaskan kasus')),
-              if (c['agent_id'] != null && !closed) FilledButton.icon(onPressed: busy || loading ? null : recordActivity, icon: const Icon(Icons.add_comment_outlined), label: const Text('Catat aktivitas')),
-              if (c['agent_id'] != null && !closed) OutlinedButton.icon(onPressed:busy||loading?null:simulateContact,icon:const Icon(Icons.phone_outlined),label:const Text('Tindak lanjut simulasi')),
+              if (!widget.api.readOnly && c['agent_id'] != null && !closed) FilledButton.icon(onPressed: busy || loading ? null : recordActivity, icon: const Icon(Icons.add_comment_outlined), label: const Text('Catat aktivitas')),
+              if (!widget.api.readOnly && c['agent_id'] != null && !closed) OutlinedButton.icon(onPressed:busy||loading?null:simulateContact,icon:const Icon(Icons.phone_outlined),label:const Text('Tindak lanjut simulasi')),
               if (widget.api.supervisor && c['agent_id'] != null && !closed) OutlinedButton.icon(onPressed: busy || loading ? null : reassignCase, icon: const Icon(Icons.sync), label: const Text('Penugasan ulang')),
               if (widget.api.supervisor && !closed) OutlinedButton.icon(onPressed: busy || loading ? null : overrideCase, icon: const Icon(Icons.person_search_outlined), label: const Text('Pilih petugas tertentu')),
             ]),

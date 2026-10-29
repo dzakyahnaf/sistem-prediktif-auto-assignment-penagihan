@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: assignment-studio-demo
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /api/health
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: cloud
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: TRUSTED_PROXY_CIDRS
+        sync: false
+      - key: OMP_NUM_THREADS
+        value: '1'
+      - key: OPENBLAS_NUM_THREADS
+        value: '1'
